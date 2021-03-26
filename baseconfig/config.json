@@ -1,0 +1,29 @@
+{
+    "params": {
+        "log_path": "/logs/",
+        "log_level": "info",
+        "port_icap": 13440,
+        "size_preview": 10240,
+        "modif_mode": "frame",
+        "undefined_date": 100,
+        "send_undef": 0,
+        "convert": 1,
+        "files_path": "/usr/src/script/files/",
+        "interval": 5000
+    },
+    "User_Agent_Headers": {
+            "User-Agent": "python-requests/2.25.1",
+            "Connection": "keep-alive"
+        },
+    "DataBase": {
+        "user": "admin",
+        "password": "qwerty",
+        "database": "DataBaseSQL",
+        "host": "172.19.2.1",
+        "port": 5669,
+
+        "charset": "utf8mb4",
+        "use_unicode": true,
+        "autocommit": true
+    }
+}
