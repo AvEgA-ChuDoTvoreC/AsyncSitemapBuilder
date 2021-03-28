@@ -455,6 +455,7 @@ if __name__ == '__main__':
     creator = CSVCreator(filename='tmp_sitemap/tmp.dat', layers_level=5)
     creator.make_csv()
 
+
     creator2 = VisualSitemapView()
     creator2.make_pdf_jpg()
 
