@@ -23,6 +23,7 @@ $ python crawler.py crawler-test.com
 Check ```tmp_sitemap``` folder or wait til ```run_command()``` function open with ```subprocess.Popen()``` them (see ```visual_grath.py```).
 
 FIXME: 
+ - [x] progress bar
  - [ ] arg_parser.py is not set up
  - [ ] not optimized start with '__main'
  - [ ] no data base saves

@@ -5,14 +5,11 @@ import json
 import os
 import sys
 import re
-from pprint import pprint
 from datetime import timedelta
 import subprocess
-from subprocess import Popen, PIPE
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-import requests
 import aiohttp
 from bs4 import BeautifulSoup
 
@@ -21,6 +18,7 @@ from errors_exceptions import response_status_codes, UserError, ServerError
 from csv_creator import CSVCreator
 from visual_grath import VisualSitemapView
 from element_tree import ElementTreeCreator
+from progres_bar import ProgressBar
 
 
 try:
@@ -265,6 +263,13 @@ class AsyncContentDownoader:
         self.filename = str()
         self.headers = headers
         self.links = None
+        # TODO: comment lines:
+        self.pr_bar = ProgressBar()
+        self._ = 0
+        self.all_links = list()
+        self.text = None
+
+        self.current_checked_links = None
 
     async def __aenter__(self):
         self._aio_session = aiohttp.ClientSession(headers=self.headers)
@@ -281,7 +286,7 @@ class AsyncContentDownoader:
             resp = await self._session.get(url)
             content = await resp.read()
         except Exception as err:
-            print(err)
+            # print(err)
             content = None
         finally:
             pass
@@ -297,11 +302,11 @@ class AsyncContentDownoader:
                                            domain_url=_domain_url,
                                            parse_main_page=parse_main_page)
         else:
-            print("link_list ----> 0")
+            # print("link_list ----> 0")
             link_list = list()
 
         if _domain_url:
-            print(f"{len(link_list)} Result Links for {url}")
+            # print(f"{len(link_list)} Result Links for {url}")
             # pprint(link_list)
 
             with open('tmp_sitemap/tmp.dat', 'a+') as ff:
@@ -320,6 +325,13 @@ class AsyncContentDownoader:
         for i in parsed_links:
             if i not in crawler_links:
                 crawler_links.append(i)
+        # TODO: comment lines:
+            self.all_links.append(i)
+
+        spaces = (len('9999999') - len(str(len(self.all_links)))) * " "
+        self.text = f'\r Links scanned: {len(self.all_links)}{spaces} [{url}]'
+        sys.stdout.write(self.text)
+        sys.stdout.flush()
 
     async def main(self, _links, _domain_url=None, parse_main_page=False):
         tasks = list()
@@ -366,6 +378,8 @@ def find_all_paths(graph, start, end, path=[]):
 
 if __name__ == '__main__':
     print("Go")
+    with open('tmp_sitemap/tmp.dat', 'w') as ff:
+        pass
     t = time.perf_counter()
 
     config_file_name = 'config.json'
@@ -378,6 +392,11 @@ if __name__ == '__main__':
 
     run_links = list()
     crawler_links = list()
+
+    # TODO: comment lines:
+    pr_bar = ProgressBar()
+    total_links = list()
+    current_checked_links = list()
 
     # link = 'vistgroup.ru'
     link = cmd_args.domain
@@ -400,7 +419,7 @@ if __name__ == '__main__':
     while len(tmp_list) != 0:
         tmp_list = crawler_links.copy()
 
-        print("TMP LIST BEFORE: ", len(tmp_list))
+        # print("TMP LIST BEFORE: ", len(tmp_list))
         count += 1
         if count >= 2:
             try:
@@ -410,7 +429,7 @@ if __name__ == '__main__':
             except ValueError as err:
                 print(err)
 
-        print("TMP LIST AFTER: ", len(tmp_list))
+        # print("TMP LIST AFTER: ", len(tmp_list))
         if len(tmp_list) > 0:
 
             crawler = AsyncCrawlerStarter(crawler_links_list=tmp_list,
@@ -421,6 +440,14 @@ if __name__ == '__main__':
             break
 
         checked_links = checked_links + tmp_list.copy()
+
+        # TODO: comment lines:
+        current_checked_links = current_checked_links + tmp_list
+        x = len(current_checked_links)
+        y = len(crawler_links)
+        res = (x/y)
+        pr_bar.update_progress(progress=res, text=f'[{x}/{y}]')
+        print()
 
     sitemap = ElementTreeCreator(links_list=crawler_links)
     sitemap_file = sitemap.creating_sitemap().write('tmp_sitemap/sitemap.xml')

@@ -121,6 +121,7 @@ venv.bak/
 
 # tmp files
 tmp_sitemap/
+logs/
 
 # Spyder project settings
 .spyderproject
